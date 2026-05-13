@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Prescription - PharmaCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #10b981;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .container {
+            width: 100%; max-width: 600px; background: var(--bg-card); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; padding: 40px; position: relative;
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 10px; }
+        .header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .upload-zone {
+            border: 2px dashed var(--primary); border-radius: var(--radius); padding: 40px 20px; text-align: center; background: #eff6ff; cursor: pointer; transition: all 0.3s; margin-bottom: 30px; position: relative;
+        }
+        .upload-zone:hover { background: #dbeafe; border-color: var(--primary-hover); }
+        .upload-zone i { font-size: 3rem; color: var(--primary); margin-bottom: 15px; }
+        .upload-zone h3 { font-size: 1.1rem; margin-bottom: 5px; }
+        .upload-zone p { font-size: 0.85rem; color: var(--text-muted); }
+        
+        #file-input { display: none; }
+
+        .preview-container {
+            display: none; align-items: center; gap: 15px; padding: 15px; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 30px;
+        }
+        .preview-icon { font-size: 2rem; color: var(--secondary); }
+        .preview-details { flex: 1; }
+        .preview-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; }
+        .preview-size { font-size: 0.8rem; color: var(--text-muted); }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border); margin-top: 15px; }
+
+        /* Scanner Animation */
+        .scanner-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.9); z-index: 10; display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .scanner-line {
+            width: 100%; max-width: 300px; height: 3px; background: var(--secondary); position: relative; overflow: hidden; margin-bottom: 20px; box-shadow: 0 0 10px var(--secondary);
+            animation: scan 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes scan {
+            0% { transform: translateY(-50px); }
+            100% { transform: translateY(50px); }
+        }
+        .scanner-text { font-weight: 600; color: var(--text-main); font-size: 1.1rem; }
+        .scanner-subtext { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-file-prescription"></i> Upload Prescription</h1>
+            <p>Upload a clear photo or PDF of your doctor's prescription. Our smart system will extract the medicines for fast checkout.</p>
+        </div>
+
+        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <h3>Drag & drop or click to upload</h3>
+            <p>Supports JPG, PNG, PDF (Max 5MB)</p>
+            <input type="file" id="file-input" accept="image/*,.pdf" onchange="handleFile(this)">
+        </div>
+
+        <div class="preview-container" id="preview-box">
+            <i class="fa-regular fa-image preview-icon"></i>
+            <div class="preview-details">
+                <div class="preview-name" id="file-name">prescription_img.jpg</div>
+                <div class="preview-size" id="file-size">1.2 MB</div>
+            </div>
+            <i class="fa-solid fa-circle-check" style="color: var(--secondary); font-size: 1.2rem;"></i>
+        </div>
+
+        <button class="btn btn-primary" onclick="startScan()" id="submit-btn" disabled style="opacity: 0.5;">
+            <i class="fa-solid fa-microchip"></i> Analyze & Submit
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='store.html'">Cancel</button>
+
+        <!-- Scanner Simulation UI -->
+        <div class="scanner-overlay" id="scanner">
+            <i class="fa-solid fa-microscope" style="font-size: 3rem; color: var(--secondary); margin-bottom: 20px;"></i>
+            <div class="scanner-line"></div>
+            <div class="scanner-text" id="scan-text">Extracting handwriting...</div>
+            <div class="scanner-subtext">Powered by Smart OCR</div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+
+        function handleFile(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                document.getElementById('file-name').innerText = selectedFile.name;
+                document.getElementById('file-size').innerText = (selectedFile.size / 1024 / 1024).toFixed(2) + ' MB';
+                
+                document.getElementById('preview-box').style.display = 'flex';
+                const btn = document.getElementById('submit-btn');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+
+        async function startScan() {
+            if (!selectedFile) return;
+
+            const scanner = document.getElementById('scanner');
+            const scanText = document.getElementById('scan-text');
+            scanner.style.display = 'flex';
+
+            // Simulate OCR scanning stages
+            setTimeout(() => { scanText.innerText = "Verifying Doctor's Signature..."; }, 1500);
+            setTimeout(() => { scanText.innerText = "Cross-referencing Medicines..."; }, 3000);
+
+            // Submit to backend
+            setTimeout(async () => {
+                const payload = {
+                    fileName: selectedFile.name,
+                    fileUrl: "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=500&q=80", // Placeholder mockup image
+                    customer: { id: 1 }
+                };
+
+                try {
+                    const res = await fetch('http://localhost:8080/api/prescriptions/upload', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if(res.ok) {
+                        scanText.innerText = "Verification Complete!";
+                        scanText.style.color = "var(--secondary)";
+                        document.querySelector('.scanner-line').style.display = 'none';
+                        document.querySelector('.fa-microscope').className = 'fa-solid fa-circle-check';
+                        
+                        setTimeout(() => {
+                            window.location.href = 'customer-dashboard.html';
+                        }, 1000);
+                    } else {
+                        alert("Error uploading prescription.");
+                        scanner.style.display = 'none';
+                    }
+                } catch(e) {
+                    console.error(e);
+                    alert("Network error.");
+                    scanner.style.display = 'none';
+                }
+            }, 4500);
+        }
+    </script>
+</body>
+</html>

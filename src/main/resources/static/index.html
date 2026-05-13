@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS - Pharmacy Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo-container">
+            <i class="fa-solid fa-staff-snake"></i>
+            <span>PharmaCare</span>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" data-target="dashboard-view">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="pos-view">
+                    <i class="fa-solid fa-cash-register"></i> POS / Sales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="medicines-view">
+                    <i class="fa-solid fa-pills"></i> Medicines
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="customers-view">
+                    <i class="fa-solid fa-users"></i> Customers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" data-target="suppliers-view">
+                    <i class="fa-solid fa-truck-medical"></i> Suppliers
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="page-title" id="topbar-title">Dashboard</div>
+            <div class="user-profile" id="admin-menu-toggle">
+                <div class="user-avatar">A</div>
+                <span style="font-weight: 500;">Admin</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; color: var(--text-muted);"></i>
+                
+                <div class="dropdown-menu" id="admin-dropdown">
+                    <a href="#" class="dropdown-item nav-link" data-target="profile-view"><i class="fa-solid fa-user"></i> My Profile</a>
+                    <a href="#" class="dropdown-item nav-link" data-target="settings-view"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Views Container -->
+        <div class="content-container">
+            
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view-section">
+                <div class="grid-cards">
+                    <div class="card stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-pills"></i></div>
+                        <div class="stat-details">
+                            <p>Total Medicines</p>
+                            <h3 id="stat-total-medicines">0</h3>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="stat-details">
+                            <p>Low Stock</p>
+                            <h3 id="stat-low-stock">0</h3>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--secondary);"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                        <div class="stat-details">
+                            <p>Today's Sales</p>
+                            <h3 id="stat-todays-sales">₹0.00</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-cards" style="grid-template-columns: 2fr 1fr;">
+                    <div class="card">
+                        <h3 style="margin-bottom: 15px; color: var(--text-main);">Low Stock Alerts</h3>
+                        <table id="low-stock-table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine Name</th>
+                                    <th>Remaining Stock</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicines View -->
+            <div id="medicines-view" class="view-section" style="display: none;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <input type="text" id="medicine-search" class="form-control" placeholder="Search medicines by name or category..." style="max-width: 350px;">
+                        <button class="btn btn-primary" onclick="openMedicineModal()"><i class="fa-solid fa-plus"></i> Add Medicine</button>
+                    </div>
+                    <table id="medicines-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Price</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customers View -->
+            <div id="customers-view" class="view-section" style="display: none;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <input type="text" id="customer-search" class="form-control" placeholder="Search customers..." style="max-width: 350px;">
+                        <button class="btn btn-primary" onclick="openCustomerModal()"><i class="fa-solid fa-plus"></i> Add Customer</button>
+                    </div>
+                    <table id="customers-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Suppliers View -->
+            <div id="suppliers-view" class="view-section" style="display: none;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <input type="text" id="supplier-search" class="form-control" placeholder="Search suppliers..." style="max-width: 350px;">
+                        <button class="btn btn-primary" onclick="openSupplierModal()"><i class="fa-solid fa-plus"></i> Add Supplier</button>
+                    </div>
+                    <table id="suppliers-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Company Name</th>
+                                <th>Contact Person</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- POS View -->
+            <div id="pos-view" class="view-section" style="display: none;">
+                <div class="pos-layout">
+                    <!-- Products Area -->
+                    <div class="pos-products">
+                        <div class="pos-search">
+                            <input type="text" id="pos-search-input" placeholder="Search medicines by name..." oninput="filterPOS()">
+                        </div>
+                        <div id="pos-product-list" class="grid-cards" style="margin-top: 20px;">
+                            <!-- Products populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Cart Area -->
+                    <div class="pos-cart">
+                        <div style="padding: 15px; border-bottom: 1px solid var(--border); background: var(--bg-main); border-radius: 12px 12px 0 0;">
+                            <h3 style="color: var(--text-main);">Current Sale</h3>
+                        </div>
+                        <div class="cart-items" id="cart-items-container">
+                            <!-- Cart items populated by JS -->
+                        </div>
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="cart-subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Tax (5%):</span>
+                                <span id="cart-tax">₹0.00</span>
+                            </div>
+                            <div class="summary-row" style="align-items: center;">
+                                <span>Discount (₹):</span>
+                                <input type="number" id="cart-discount" class="form-control" style="width: 80px; padding: 5px; height: 30px;" value="0" min="0" oninput="renderCart()">
+                            </div>
+                            <div class="summary-row" style="align-items: center; margin-top: 5px; margin-bottom: 5px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; color: var(--primary);">
+                                    <input type="checkbox" id="cart-quick-delivery" onchange="toggleDelivery()">
+                                    <i class="fa-solid fa-motorcycle"></i> Quick Delivery
+                                </label>
+                            </div>
+                            <div id="delivery-address-container" style="display: none; margin-bottom: 10px;">
+                                <input type="text" id="cart-delivery-address" class="form-control" placeholder="Enter delivery address..." style="width: 100%; font-size: 0.85rem; padding: 8px;">
+                            </div>
+                            <div class="summary-row" id="delivery-fee-row" style="display: none;">
+                                <span>Delivery Fee:</span>
+                                <span id="cart-delivery-fee">₹50.00</span>
+                            </div>
+                            <div class="summary-total">
+                                <span>Net Total:</span>
+                                <span id="cart-total" style="color: var(--primary);">₹0.00</span>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 20px; padding: 15px; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);" onclick="processSale()">
+                                <i class="fa-solid fa-check"></i> Complete Sale & Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Profile View -->
+            <div id="profile-view" class="view-section" style="display: none;">
+                <div class="card" style="max-width: 600px; margin: 0 auto;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2.5rem; margin: 0 auto 15px auto;">A</div>
+                        <h2 style="color: var(--text-main);">Admin User</h2>
+                        <p style="color: var(--text-muted);">Administrator</p>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control" value="Admin User">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" class="form-control" value="admin@pharmacare.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="text" class="form-control" value="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" class="form-control" placeholder="Leave blank to keep current password">
+                        </div>
+                        <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="alert('Profile updated successfully!')">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view-section" style="display: none;">
+                <div class="card" style="max-width: 600px; margin: 0 auto;">
+                    <h2 style="margin-bottom: 20px;">System Settings</h2>
+                    <form>
+                        <div class="form-group">
+                            <label>Pharmacy Name</label>
+                            <input type="text" class="form-control" value="PharmaCare">
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Email</label>
+                            <input type="email" class="form-control" value="contact@pharmacare.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Rate (%)</label>
+                            <input type="number" step="0.1" class="form-control" value="5.0">
+                        </div>
+                        <div class="form-group">
+                            <label>Currency Symbol</label>
+                            <select class="form-control">
+                                <option value="₹">₹ (INR)</option>
+                                <option value="$">$ (USD)</option>
+                                <option value="€">€ (EUR)</option>
+                                <option value="£">£ (GBP)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Theme Preference</label>
+                            <select class="form-control">
+                                <option>System Default</option>
+                                <option>Light Mode</option>
+                                <option>Dark Mode</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;" onclick="alert('Settings saved successfully!')">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Medicine Modal -->
+    <div id="medicine-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('medicine-modal')">&times;</button>
+            <h2 style="margin-bottom: 20px;">Add New Medicine</h2>
+            <form id="medicine-form">
+                <div class="form-group">
+                    <label>Medicine Name</label>
+                    <input type="text" id="med-name" class="form-control" required>
+                </div>
+                <div class="grid-cards" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="med-category" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity in Stock</label>
+                        <input type="number" id="med-qty" class="form-control" required>
+                    </div>
+                </div>
+                <div class="grid-cards" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+                    <div class="form-group">
+                        <label>Selling Price (₹)</label>
+                        <input type="number" step="0.01" id="med-price" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cost Price (₹)</label>
+                        <input type="number" step="0.01" id="med-cost" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="date" id="med-expiry" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Save Medicine</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Modal -->
+    <div id="customer-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('customer-modal')">&times;</button>
+            <h2 style="margin-bottom: 20px;">Add New Customer</h2>
+            <form id="customer-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="cust-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="cust-phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="cust-email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" id="cust-address" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Save Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div id="supplier-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('supplier-modal')">&times;</button>
+            <h2 style="margin-bottom: 20px;">Add New Supplier</h2>
+            <form id="supplier-form">
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="sup-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Contact Person</label>
+                    <input type="text" id="sup-person" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="sup-phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="sup-email" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Save Supplier</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invoice Modal (Receipt) -->
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content large">
+            <button class="modal-close" onclick="closeModal('invoice-modal')">&times;</button>
+            
+            <div id="invoice-printable-area">
+                <div class="invoice-header">
+                    <h1>PharmaCare</h1>
+                    <p>123 Health Avenue, Medical District, Mumbai, MH 400001</p>
+                    <p>Phone: (555) 123-4567 | Email: contact@pharmacare.com</p>
+                    <h3 style="margin-top: 15px; color: var(--text-main);">TAX INVOICE</h3>
+                    <p style="text-align: right; margin-top: -20px;" id="invoice-date"></p>
+                </div>
+
+                <div id="inv-delivery-address-section" style="margin-top: 15px; margin-bottom: 15px; display: none; padding: 10px; background: rgba(59, 130, 246, 0.05); border-radius: 8px; border-left: 4px solid var(--primary);">
+                    <strong style="color: var(--primary);"><i class="fa-solid fa-motorcycle"></i> Delivery Address:</strong> <br>
+                    <span id="inv-delivery-address" style="font-size: 0.95rem; color: var(--text-main);"></span>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Qty</th>
+                            <th>Unit Price</th>
+                            <th style="text-align: right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoice-items">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                    <div style="width: 250px;">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="inv-subtotal">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (5%):</span>
+                            <span id="inv-tax">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Discount:</span>
+                            <span id="inv-discount">-₹0.00</span>
+                        </div>
+                        <div class="summary-row" id="inv-delivery-row" style="display: none;">
+                            <span>Delivery Fee:</span>
+                            <span id="inv-delivery-fee">₹50.00</span>
+                        </div>
+                        <div class="summary-total" style="font-size: 1.5rem;">
+                            <span>Net Total:</span>
+                            <span id="inv-total" style="color: var(--primary);">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 40px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                    <p>Thank you for shopping with PharmaCare!</p>
+                    <p>Get well soon.</p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button class="btn btn-outline" style="flex: 1; justify-content: center;" onclick="closeModal('invoice-modal')">Close</button>
+                <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

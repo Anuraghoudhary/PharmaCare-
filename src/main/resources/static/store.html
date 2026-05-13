@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCare Store</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #10b981;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--bg-card);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            padding-left: 45px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background: var(--bg-body);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-top: 5px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .suggestion-item {
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid var(--border);
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: var(--bg-body); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--secondary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 60px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 20px;
+            margin: 20px 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.8rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+        .hero-content h1 span { color: var(--primary); }
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Categories */
+        .categories {
+            padding: 20px 40px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        
+        .cat-pill {
+            padding: 10px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .cat-pill:hover, .cat-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Product Grid */
+        .container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .rx-badge {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .product-generic {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .product-rating {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .product-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .btn-add {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .btn-add:hover { background: #059669; }
+
+        /* Cart & Modal Styles */
+        .cart-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+        .cart-panel {
+            position: fixed;
+            top: 0; right: -400px;
+            width: 400px; height: 100vh;
+            background: var(--bg-card);
+            z-index: 1001;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-panel.open { right: 0; }
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cart-body {
+            flex: 1; overflow-y: auto; padding: 20px;
+        }
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+        }
+        .cart-item {
+            display: flex; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border);
+        }
+        .cart-item-img {
+            width: 60px; height: 60px; border-radius: 8px; object-fit: cover;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            width: 100%; max-width: 500px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            animation: slideUp 0.3s ease-out;
+        }
+        .modal-header {
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-body { padding: 20px; }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#" class="brand">
+            <i class="fa-solid fa-notes-medical"></i> PharmaCare
+        </a>
+
+        <div class="search-container">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" class="search-input" id="search-input" placeholder="Search medicines, categories, symptoms...">
+            <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+
+        <div class="nav-actions">
+            <button class="nav-btn"><i class="fa-regular fa-heart"></i></button>
+            <button class="nav-btn" onclick="toggleCart()">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge" id="cart-count">0</span>
+            </button>
+            <a href="login.html" class="btn btn-primary" style="padding: 8px 16px; border-radius: 20px; text-decoration: none;"><i class="fa-regular fa-user"></i> Sign In</a>
+        </div>
+    </nav>
+
+    <!-- Categories -->
+    <div class="categories" id="category-container">
+        <div class="cat-pill active">All Medicines</div>
+        <div class="cat-pill">Painkillers</div>
+        <div class="cat-pill">Antibiotics</div>
+        <div class="cat-pill">Cardiovascular</div>
+        <div class="cat-pill">Vitamins</div>
+        <div class="cat-pill">First Aid</div>
+        <div class="cat-pill">Diabetes</div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Your Health, <br><span>Delivered Fast.</span></h1>
+            <p>Get genuine medicines, prescribed drugs, and healthcare essentials delivered right to your doorstep within hours.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('product-grid').scrollIntoView({behavior: 'smooth'})"><i class="fa-solid fa-bolt"></i> Quick Delivery Nearby</button>
+            <a href="prescription.html" class="btn" style="background: white; border: 1px solid var(--border); margin-left: 10px; text-decoration: none; display: inline-block; color: var(--text-main);"><i class="fa-solid fa-file-prescription"></i> Upload Prescription</a>
+        </div>
+        <div class="hero-image" style="font-size: 10rem; color: #bfdbfe;">
+            <i class="fa-solid fa-truck-medical"></i>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="container">
+        <h2 class="section-title">Featured Medicines</h2>
+        <div class="grid" id="product-grid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- Cart Slide-out Panel -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="nav-btn" onclick="toggleCart()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-body" id="cart-items">
+            <!-- Populated by JS -->
+            <p style="text-align:center; color:var(--text-muted); margin-top:50px;">Your cart is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:600; font-size:1.2rem;">
+                <span>Total:</span>
+                <span id="cart-total">₹0.00</span>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="openCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Smart Delivery Checkout</h2>
+                <button class="nav-btn" onclick="closeCheckout()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="checkout-form">
+                    <h3 style="margin-bottom:15px;">Delivery Details</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom:5px; font-weight:500;">Delivery Address</label>
+                        <textarea id="checkout-address" class="form-control" rows="2" placeholder="Enter your full address" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); resize:none;"></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:15px; margin-bottom: 15px;">
+                        <div style="flex:1;">
+                            <label style="display:block; margin-bottom:5px; font-weight:500;">Delivery Date</label>
+                            <input type="date" id="checkout-date" class="form-control" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);">
+                        </div>
+                        <div style="flex:1;">
+                            <label style="display:block; margin-bottom:5px; font-weight:500;">Preferred Time</label>
+                            <select id="checkout-time" class="form-control" required style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);">
+                                <option value="09:00 AM - 12:00 PM">09:00 AM - 12:00 PM</option>
+                                <option value="12:00 PM - 03:00 PM">12:00 PM - 03:00 PM</option>
+                                <option value="03:00 PM - 06:00 PM">03:00 PM - 06:00 PM</option>
+                                <option value="06:00 PM - 09:00 PM">06:00 PM - 09:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:flex; align-items:center; gap:10px; padding:15px; background:#fff1f2; border:1px solid #fecdd3; border-radius:8px; cursor:pointer;">
+                            <input type="checkbox" id="checkout-emergency" onchange="calculateFinalTotal()">
+                            <div>
+                                <strong style="color:#e11d48; display:block;">Emergency Delivery (Within 1 Hour)</strong>
+                                <span style="font-size:0.85rem; color:#881337;">Additional ₹150.00 charge applies. Subject to availability.</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div style="background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:20px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:var(--text-muted);">
+                            <span>Subtotal:</span>
+                            <span id="summary-subtotal">₹0.00</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--text-muted);">
+                            <span>Delivery Fee:</span>
+                            <span id="summary-delivery">₹0.00</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.2rem; padding-top:10px; border-top:1px solid var(--border);">
+                            <span>Total Amount:</span>
+                            <span id="summary-total" style="color:var(--primary);">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Place Order Securely</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/store.js"></script>
+</body>
+</html>

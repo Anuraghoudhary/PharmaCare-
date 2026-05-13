@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - PharmaCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #10b981;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0 30px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 15px 30px;
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary);
+            background: #eff6ff;
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .header h1 { font-size: 1.8rem; }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: var(--primary); color: white; border: none; }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Active Order Tracking */
+        .tracking-status {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+        .tracking-status::before {
+            content: '';
+            position: absolute;
+            top: 20px; left: 40px; right: 40px;
+            height: 3px;
+            background: var(--border);
+            z-index: 1;
+        }
+        .tracking-status::after {
+            content: '';
+            position: absolute;
+            top: 20px; left: 40px; width: 50%;
+            height: 3px;
+            background: var(--secondary);
+            z-index: 1;
+        }
+        .status-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        .step-icon {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        .status-step.completed .step-icon {
+            background: var(--secondary);
+            color: white;
+        }
+        .status-step.active .step-icon {
+            background: white;
+            border: 3px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-delivery { background: #dbeafe; color: #2563eb; }
+        .badge-success { background: #d1fae5; color: #059669; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="store.html" class="brand">
+            <i class="fa-solid fa-notes-medical"></i> PharmaCare
+        </a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-box"></i> My Orders</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-file-prescription"></i> Prescriptions</a>
+        <a href="#" class="nav-item"><i class="fa-regular fa-heart"></i> Saved Items</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-location-dot"></i> Addresses</a>
+        <a href="#" class="nav-item" style="margin-top: auto;"><i class="fa-solid fa-gear"></i> Settings</a>
+        <a href="store.html" class="nav-item"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div>
+                <h1>Welcome back, John!</h1>
+                <p style="color:var(--text-muted);">Here is what's happening with your health and orders today.</p>
+            </div>
+            <a href="store.html" class="btn btn-primary"><i class="fa-solid fa-cart-shopping"></i> Continue Shopping</a>
+        </div>
+
+        <!-- Active Order -->
+        <div class="card" style="margin-bottom: 25px;">
+            <div class="card-title">Active Delivery <span class="badge badge-delivery">Out for Delivery</span></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                <div>
+                    <div style="color:var(--text-muted); font-size:0.9rem;">Order #ORD-84392</div>
+                    <div style="font-weight:600; font-size:1.1rem;">Arriving Today by 03:00 PM</div>
+                </div>
+                <button class="btn" style="background:#eff6ff; color:var(--primary); border:1px solid #bfdbfe;">Track Live Location</button>
+            </div>
+
+            <div class="tracking-status">
+                <div class="status-step completed">
+                    <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+                    <span style="font-size:0.85rem; font-weight:500;">Order Placed</span>
+                </div>
+                <div class="status-step completed">
+                    <div class="step-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <span style="font-size:0.85rem; font-weight:500;">Packed</span>
+                </div>
+                <div class="status-step active">
+                    <div class="step-icon"><i class="fa-solid fa-truck"></i></div>
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-main);">Out for Delivery</span>
+                </div>
+                <div class="status-step">
+                    <div class="step-icon"><i class="fa-solid fa-house"></i></div>
+                    <span style="font-size:0.85rem; color:var(--text-muted);">Delivered</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Order History -->
+            <div class="card">
+                <div class="card-title">Recent Orders <a href="#" style="font-size:0.85rem; color:var(--primary); text-decoration:none;">View All</a></div>
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- To be populated by JS, showing static for now -->
+                        <tr>
+                            <td style="font-weight:500;">ORD-84392</td>
+                            <td>Today, 10:30 AM</td>
+                            <td style="font-weight:600;">₹525.00</td>
+                            <td><span class="badge badge-delivery">Out for Delivery</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:500;">ORD-81204</td>
+                            <td>May 02, 2026</td>
+                            <td style="font-weight:600;">₹1,240.00</td>
+                            <td><span class="badge badge-success">Delivered</span></td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:500;">ORD-79921</td>
+                            <td>Apr 15, 2026</td>
+                            <td style="font-weight:600;">₹340.00</td>
+                            <td><span class="badge badge-success">Delivered</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Spending Analytics -->
+            <div class="card">
+                <div class="card-title">Monthly Health Spending</div>
+                <canvas id="spendingChart" height="250"></canvas>
+            </div>
+            <!-- Prescriptions -->
+            <div class="card" style="grid-column: 1 / -1; margin-top: 25px;">
+                <div class="card-title">My Prescriptions <a href="prescription.html" style="font-size:0.85rem; color:white; background:var(--primary); padding:5px 12px; border-radius:20px; text-decoration:none;">+ Upload New</a></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Uploaded Date</th>
+                            <th>Extraction Results</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prescriptions-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Chart.js for Spending
+        const ctx = document.getElementById('spendingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                datasets: [{
+                    label: 'Spending (₹)',
+                    data: [1200, 1900, 800, 1500, 2400],
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [2, 4], color: '#e2e8f0' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Fetch Prescriptions
+        async function loadPrescriptions() {
+            try {
+                const res = await fetch('http://localhost:8080/api/prescriptions/customer/1');
+                const data = await res.json();
+                
+                const tbody = document.getElementById('prescriptions-body');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color:var(--text-muted);">No prescriptions uploaded yet.</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = '';
+                data.forEach(p => {
+                    const dateObj = new Date(p.uploadedDate);
+                    const formattedDate = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    let statusBadge = `<span class="badge badge-pending">${p.status}</span>`;
+                    if(p.status === 'Approved') statusBadge = `<span class="badge badge-success">Approved</span>`;
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight:500;"><i class="fa-regular fa-image" style="color:var(--text-muted); margin-right:8px;"></i> ${p.fileName || 'prescription.jpg'}</td>
+                            <td>${formattedDate}</td>
+                            <td style="font-size:0.85rem; color:var(--text-muted); max-width: 300px;">${p.extractedText || '-'}</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                console.error("Error loading prescriptions", e);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadPrescriptions);
+
+    </script>
+</body>
+</html>
